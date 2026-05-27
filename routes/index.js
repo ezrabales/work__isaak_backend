@@ -12,6 +12,7 @@ router.post("/signup", validatorCreateUser, createUser);
 
 router.use("/users", require("./users"));
 router.use("/picture", require("./picture"));
+router.use("/jobs", require("./jobs"));
 
 router.get("/test", (req, res) => {
   res.send("working");

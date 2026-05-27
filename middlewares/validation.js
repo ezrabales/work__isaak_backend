@@ -23,7 +23,7 @@ module.exports.validatorLogIn = celebrate({
   }),
 });
 
-module.exports.validatorGetByInvoice = celebrate({
+module.exports.validatorGetPicByInvoice = celebrate({
   params: Joi.object().keys({
     invoiceNumber: Joi.string().required(),
   }),
@@ -32,7 +32,30 @@ module.exports.validatorGetByInvoice = celebrate({
 module.exports.validatorCreatePicture = celebrate({
   body: Joi.object().keys({
     src: Joi.string().required(),
-    description: Joi.string().allow("").optional(),
+    description: Joi.string().optional(),
     invoiceNumber: Joi.string().required(),
+  }),
+});
+
+module.exports.validatorGetJobsByInvoice = celebrate({
+  params: Joi.object().keys({
+    owner: Joi.string(),
+  }),
+});
+
+module.exports.validatorCreateJob = celebrate({
+  body: Joi.object().keys({
+    invoiceNumber: Joi.string().optional(),
+    location: Joi.string().required(),
+    notes: Joi.string().optional(),
+    paymentStatus: Joi.string()
+      .valid(
+        "Not Charged",
+        "Awaiting Payment",
+        "Partially Paid",
+        "Paid in Full",
+      )
+      .default("Not Charged"),
+    invoiceInfo: Joi.string().optional(),
   }),
 });

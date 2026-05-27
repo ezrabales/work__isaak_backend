@@ -3,10 +3,10 @@ const { createPicture, getPictures } = require("../controllers/pictures");
 const { auth } = require("../middlewares/auth");
 const {
   validatorCreatePicture,
-  validatorGetByInvoice,
+  validatorGetPicByInvoice,
 } = require("../middlewares/validation");
 
 router.post("/", auth, validatorCreatePicture, createPicture);
-router.get("/:invoiceNumber", auth, validatorGetByInvoice, getPictures);
+router.get("/:invoiceNumber", auth, validatorGetPicByInvoice, getPictures);
 
 module.exports = router;

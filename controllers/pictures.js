@@ -15,8 +15,6 @@ module.exports.createPicture = (req, res, next) => {
 };
 
 module.exports.getPictures = (req, res, next) => {
-  console.log(req.method);
-  console.log(req.params);
   const { invoiceNumber } = req.params;
 
   picture

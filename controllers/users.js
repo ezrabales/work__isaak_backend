@@ -10,7 +10,6 @@ const ConflictError = require("../errors/ConflictError");
 const NotFoundError = require("../errors/NotFoundError");
 
 module.exports.logIn = (req, res, next) => {
-  console.log("SIGN IN HIT");
   const { email, password } = req.body;
 
   return User.findOne({ email })

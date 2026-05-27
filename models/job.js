@@ -3,7 +3,6 @@ const validator = require("validator");
 
 const jobSchema = new mongoose.Schema({
   invoiceNumber: {
-    required: true,
     type: String,
   },
   location: {
@@ -18,12 +17,18 @@ const jobSchema = new mongoose.Schema({
     required: true,
     ref: "User",
   },
-  // pictures: {
-  //   type:?
-  // },
   paymentStatus: {
-    required: true,
     type: String,
+    enum: {
+      values: [
+        "Not Charged",
+        "Awaiting Payment",
+        "Partially Paid",
+        "Paid in Full",
+      ],
+      message: "{VALUE} is not a valid payment status",
+    },
+    default: "Not Charged",
   },
   invoiceInfo: {
     type: String,
@@ -37,4 +42,4 @@ const jobSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("ClothingItem", jobSchema);
+module.exports = mongoose.model("job", jobSchema);

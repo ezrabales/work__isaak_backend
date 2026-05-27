@@ -1,20 +1,12 @@
 const router = require("express").Router();
-const {
-  getItems,
-  createItem,
-  deleteItem,
-  toggleLike,
-} = require("../controllers/items");
+const { createJob, getJobs } = require("../controllers/jobs");
 const { auth } = require("../middlewares/auth");
 const {
-  validatorCreateItem,
-  validatorGetById,
+  validatorCreateJob,
+  validatorGetJobsByInvoice,
 } = require("../middlewares/validation");
 
-router.get("/", getItems);
-router.post("/", auth, validatorCreateItem, createItem);
-router.delete("/:itemId", auth, validatorGetById, deleteItem);
-router.put("/:itemId/likes", auth, validatorGetById, toggleLike);
-router.delete("/:itemId/likes", auth, validatorGetById, toggleLike);
+router.post("/", auth, validatorCreateJob, createJob);
+router.get("/:owner", auth, validatorGetJobsByInvoice, getJobs);
 
 module.exports = router;
