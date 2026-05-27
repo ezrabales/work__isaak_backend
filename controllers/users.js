@@ -63,14 +63,10 @@ module.exports.createUser = async (req, res, next) => {
   }
 };
 
-module.exports.updateCurrentUser = (req, res, next) => {
+module.exports.updateCurrentUserRate = (req, res, next) => {
   const userId = req.user._id;
-  const { name, avatar } = req.body;
-  User.findByIdAndUpdate(
-    userId,
-    { name, avatar },
-    { new: true, runValidators: true },
-  )
+  const { rate } = req.body;
+  User.findByIdAndUpdate(userId, { rate }, { new: true, runValidators: true })
     .orFail(() => {
       next(new NotFoundError("User not found"));
     })
@@ -84,4 +80,14 @@ module.exports.updateCurrentUser = (req, res, next) => {
         next(err);
       }
     });
+};
+
+module.exports.getCurrentUserRate = (req, res, next) => {
+  User.findById(req.user._id)
+    .select("rate")
+    .orFail(() => {
+      next(new NotFoundError("User not found"));
+    })
+    .then((user) => res.send({ rate: user.rate }))
+    .catch(next);
 };

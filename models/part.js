@@ -1,23 +1,20 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const pictureSchema = new mongoose.Schema({
-  src: {
+const partSchema = new mongoose.Schema({
+  name: {
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-  },
-  invoiceNumber: {
+  cost: {
     type: Number,
     required: true,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
     required: true,
+    ref: "User",
   },
 });
 
-module.exports = mongoose.model("Picture", pictureSchema);
+module.exports = mongoose.model("Part", partSchema);

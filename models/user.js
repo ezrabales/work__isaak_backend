@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     select: false,
     required: true,
   },
+  rate: {
+    type: Number,
+    default: 75,
+  },
 });
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model("User", userSchema);

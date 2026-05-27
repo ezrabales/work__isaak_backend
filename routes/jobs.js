@@ -1,12 +1,13 @@
 const router = require("express").Router();
-const { createJob, getJobs } = require("../controllers/jobs");
+const { createJob, getJobs, updateJob } = require("../controllers/jobs");
 const { auth } = require("../middlewares/auth");
 const {
   validatorCreateJob,
-  validatorGetJobsByInvoice,
+  validatorUpdateJob,
 } = require("../middlewares/validation");
 
 router.post("/", auth, validatorCreateJob, createJob);
-router.get("/:owner", auth, validatorGetJobsByInvoice, getJobs);
+router.get("/", auth, getJobs);
+router.patch("/:jobId", auth, validatorUpdateJob, updateJob);
 
 module.exports = router;

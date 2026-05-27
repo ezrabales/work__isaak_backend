@@ -33,13 +33,14 @@ const jobSchema = new mongoose.Schema({
   invoiceInfo: {
     type: String,
   },
-  createdAt: {
+  dateStarted: {
     type: Date,
     default: Date.now,
   },
-  endedAt: {
+  dateEnded: {
     type: Date,
+    default: null,
   },
 });
 
-module.exports = mongoose.model("job", jobSchema);
+module.exports = mongoose.model("Job", jobSchema);
