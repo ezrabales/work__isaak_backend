@@ -61,3 +61,24 @@ module.exports.updateJob = (req, res, next) => {
       next(err);
     });
 };
+
+module.exports.deleteJob = (req, res, next) => {
+  const { jobId } = req.params;
+  Job.findById(jobId)
+    .orFail(() => {
+      next(new NotFoundError("Job not found"));
+    })
+    .then((job) => {
+      if (req.user._id !== job.owner.toString()) {
+        return next(new ForbiddenError("Not authorized"));
+      }
+      return Job.findByIdAndDelete(jobId).then(() =>
+        res
+          .status(200)
+          .send({ message: "Job deleted successfully", id: jobId }),
+      );
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

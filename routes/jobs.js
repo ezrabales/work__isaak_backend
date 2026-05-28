@@ -1,5 +1,10 @@
 const router = require("express").Router();
-const { createJob, getJobs, updateJob } = require("../controllers/jobs");
+const {
+  createJob,
+  getJobs,
+  updateJob,
+  deleteJob,
+} = require("../controllers/jobs");
 const { auth } = require("../middlewares/auth");
 const {
   validatorCreateJob,
@@ -9,5 +14,6 @@ const {
 router.post("/", auth, validatorCreateJob, createJob);
 router.get("/", auth, getJobs);
 router.patch("/:jobId", auth, validatorUpdateJob, updateJob);
+router.delete("/:jobId", auth, deleteJob);
 
 module.exports = router;
