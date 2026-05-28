@@ -1,11 +1,12 @@
 const Picture = require("../models/picture");
 
 module.exports.createPicture = (req, res, next) => {
-  const { src, description, invoiceNumber } = req.body;
+  const { src, description, assetId, invoiceNumber } = req.body;
 
   Picture.create({
     src,
     description,
+    assetId,
     invoiceNumber,
     owner: req.user._id,
   })

@@ -1,6 +1,8 @@
 const BadRequestError = require("../errors/BadRequestError");
 const NotFoundError = require("../errors/NotFoundError");
+const cloudinary = require("../utils/cloudinary");
 const Job = require("../models/job");
+const Picture = require("../models/picture");
 
 module.exports.createJob = async (req, res, next) => {
   try {
@@ -36,14 +38,26 @@ module.exports.updateJob = (req, res, next) => {
   const { jobId } = req.params;
   const userId = req.user._id;
 
-  const { location, notes, paymentStatus, dateStarted, dateEnded } = req.body;
+  const {
+    location,
+    notes,
+    email,
+    paymentStatus,
+    amountOwed,
+    amountPaid,
+    dateStarted,
+    dateEnded,
+  } = req.body;
 
   Job.findOneAndUpdate(
     { _id: jobId, owner: userId },
     {
       location,
       notes,
+      email,
       paymentStatus,
+      amountOwed,
+      amountPaid,
       dateStarted,
       dateEnded,
     },
@@ -62,23 +76,69 @@ module.exports.updateJob = (req, res, next) => {
     });
 };
 
-module.exports.deleteJob = (req, res, next) => {
+module.exports.updateJobStatus = (req, res, next) => {
   const { jobId } = req.params;
-  Job.findById(jobId)
+  const userId = req.user._id;
+
+  const { paymentStatus, amountPaid, amountOwed } = req.body;
+
+  Job.findOneAndUpdate(
+    { _id: jobId, owner: userId },
+    {
+      paymentStatus,
+      amountPaid,
+      amountOwed,
+    },
+    { new: true, runValidators: true },
+  )
     .orFail(() => {
-      next(new NotFoundError("Job not found"));
+      throw new NotFoundError("Job not found");
     })
-    .then((job) => {
-      if (req.user._id !== job.owner.toString()) {
-        return next(new ForbiddenError("Not authorized"));
-      }
-      return Job.findByIdAndDelete(jobId).then(() =>
-        res
-          .status(200)
-          .send({ message: "Job deleted successfully", id: jobId }),
-      );
-    })
+    .then((job) => res.status(200).send(job))
     .catch((err) => {
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("invalid data"));
+      }
+
       next(err);
     });
+};
+
+module.exports.deleteJob = async (req, res, next) => {
+  try {
+    const { jobId, invoiceNumber } = req.params;
+    const userId = req.user._id;
+
+    const job = await Job.findById(jobId).orFail(() => {
+      throw new NotFoundError("Job not found");
+    });
+
+    if (userId !== job.owner.toString()) {
+      throw new ForbiddenError("Not authorized");
+    }
+
+    const pictures = await Picture.find({
+      invoiceNumber: invoiceNumber,
+      owner: userId,
+    });
+
+    // Delete pictures from Cloudinary
+    if (pictures.length > 0) {
+      const assetIds = pictures.map((pic) => pic.assetId);
+
+      await cloudinary.api.delete_resources_by_asset_ids(assetIds);
+    }
+
+    // Delete pictures from db
+    await Picture.deleteMany({
+      invoiceNumber: invoiceNumber,
+      owner: userId,
+    });
+
+    await Job.findByIdAndDelete(jobId);
+
+    res.status(200).send({ message: "Job deleted successfully", id: jobId });
+  } catch (err) {
+    next(err);
+  }
 };

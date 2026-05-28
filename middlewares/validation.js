@@ -34,6 +34,7 @@ module.exports.validatorCreatePicture = celebrate({
   body: Joi.object().keys({
     src: Joi.string().required(),
     description: Joi.string().optional().allow(""),
+    assetId: Joi.string().required(),
     invoiceNumber: Joi.string().required(),
   }),
 });
@@ -44,6 +45,7 @@ module.exports.validatorCreateJob = celebrate({
     invoiceNumber: Joi.string().optional(),
     location: Joi.string().required(),
     notes: Joi.string().optional().allow(""),
+    email: Joi.string().email().empty("").optional(),
     paymentStatus: Joi.string()
       .valid(
         "Not Charged",
@@ -52,6 +54,8 @@ module.exports.validatorCreateJob = celebrate({
         "Paid in Full",
       )
       .default("Not Charged"),
+    amountOwed: Joi.number().optional().allow(""),
+    amountaPaid: Joi.number().optional().allow(""),
     invoiceInfo: Joi.string().optional(),
   }),
 });
@@ -63,6 +67,7 @@ module.exports.validatorUpdateJob = celebrate({
   body: Joi.object().keys({
     location: Joi.string().required(),
     notes: Joi.string().optional().allow(""),
+    email: Joi.string().email().allow("").optional(),
     paymentStatus: Joi.string()
       .valid(
         "Not Charged",
@@ -71,8 +76,29 @@ module.exports.validatorUpdateJob = celebrate({
         "Paid in Full",
       )
       .default("Not Charged"),
+    amountOwed: Joi.number().optional().allow(""),
+    amountPaid: Joi.number().optional().allow(""),
     dateStarted: Joi.date().required(),
     dateEnded: Joi.date().optional().allow(""),
+  }),
+});
+
+module.exports.validatorUpdateJobStatus = celebrate({
+  params: Joi.object().keys({
+    jobId: Joi.string().hex().length(24).required(),
+  }),
+  body: Joi.object().keys({
+    paymentStatus: Joi.string()
+      .valid(
+        "Not Charged",
+        "Awaiting Payment",
+        "Partially Paid",
+        "Paid in Full",
+      )
+      .default("Not Charged"),
+
+    amountPaid: Joi.number().optional().allow(""),
+    amountOwed: Joi.number().optional().allow(""),
   }),
 });
 

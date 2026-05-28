@@ -9,6 +9,9 @@ const pictureSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  assetId: {
+    type: String,
+  },
   invoiceNumber: {
     type: Number,
     required: true,
