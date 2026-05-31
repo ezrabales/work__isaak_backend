@@ -1,7 +1,6 @@
 const Invoice = require("../models/invoice");
 const PDFDocument = require("pdfkit");
 const nodemailer = require("nodemailer");
-const dns = require("dns");
 const Job = require("../models/job");
 
 // ─── Layout constants ────────────────────────────────────────────────────────
@@ -415,25 +414,13 @@ module.exports.sendInvoice = async (req, res, next) => {
     console.log("PDF built");
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
+      host: "74.125.69.109", // smtp.gmail.com IPv4
       port: 587,
       secure: false,
+      requireTLS: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
-      },
-      tls: {
-        family: 4,
-      },
-      getSocket: (options, callback) => {
-        dns.lookup(options.host, { family: 4 }, (err, address) => {
-          if (err) return callback(err);
-
-          callback(null, {
-            host: address,
-            port: options.port,
-          });
-        });
       },
     });
 
