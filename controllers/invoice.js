@@ -1,6 +1,7 @@
 const Invoice = require("../models/invoice");
 const PDFDocument = require("pdfkit");
-const nodemailer = require("nodemailer");
+import { Resend } from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY);
 const Job = require("../models/job");
 
 // ─── Layout constants ────────────────────────────────────────────────────────
@@ -413,32 +414,10 @@ module.exports.sendInvoice = async (req, res, next) => {
 
     console.log("PDF built");
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      connectionTimeout: 30000,
-      greetingTimeout: 30000,
-      socketTimeout: 30000,
-    });
-
-    console.log("Transport created");
-
-    try {
-      await transporter.verify();
-      console.log("SMTP verified");
-    } catch (err) {
-      console.error("VERIFY ERROR:", err);
-    }
-
-    await transporter.sendMail({
-      from: `"${invoice.craftsmanName || invoice.craftsmanEmail}" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: `${invoice.craftsmanName || invoice.craftsmanEmail} <noreply@yourdomain.com>`,
       to: invoice.customerEmail,
-      replyTo: invoice.craftsmanEmail,
+      reply_to: invoice.craftsmanEmail,
       subject: `$${Number(invoice.grandTotal).toFixed(2)} Invoice from ${invoice.craftsmanName || invoice.craftsmanEmail}`,
       text: `Hello ${invoice.customerName || "there"},
 
@@ -453,7 +432,6 @@ If you have any questions about the invoice, work completed, or payment details,
 Thank you — your business is appreciated.
 
 ${invoice.craftsmanName || invoice.craftsmanEmail}`,
-
       html: `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -504,11 +482,10 @@ ${invoice.craftsmanName || invoice.craftsmanEmail}`,
 
 </body>
 </html>`,
-
       attachments: [
         {
           filename: `invoice-${invoice.invoiceNumber}.pdf`,
-          content: pdfBuffer,
+          content: pdfBuffer.toString("base64"), // ← Resend wants base64, not raw Buffer
         },
       ],
     });
