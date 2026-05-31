@@ -40,26 +40,36 @@ module.exports.updateJob = (req, res, next) => {
 
   const {
     location,
+    name,
     notes,
     email,
+    phone,
+    description,
     paymentStatus,
     amountOwed,
     amountPaid,
     dateStarted,
     dateEnded,
+    paymentTerms,
+    dateDue,
   } = req.body;
 
   Job.findOneAndUpdate(
     { _id: jobId, owner: userId },
     {
       location,
+      name,
       notes,
       email,
+      phone,
+      description,
       paymentStatus,
       amountOwed,
       amountPaid,
       dateStarted,
       dateEnded,
+      paymentTerms,
+      dateDue,
     },
     { new: true, runValidators: true },
   )
@@ -86,7 +96,7 @@ module.exports.updateJobStatus = (req, res, next) => {
     { _id: jobId, owner: userId },
     {
       paymentStatus,
-      amountPaid,
+      amountPaid: paymentStatus == "Paid in Full" ? amountOwed : amountPaid,
       amountOwed,
     },
     { new: true, runValidators: true },

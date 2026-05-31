@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@emailjs/nodejs": "^5.0.2",
     "bcryptjs": "^3.0.3",
     "celebrate": "^12.1.2",
     "cloudinary": "^2.10.0",
@@ -22,6 +23,8 @@
     "express-winston": "^4.2.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.2",
+    "nodemailer": "^8.0.10",
+    "pdfkit": "^0.18.0",
     "validator": "^13.15.35",
     "winston": "^3.19.0"
   },

@@ -5,7 +5,9 @@ const jobSchema = new mongoose.Schema(
   {
     invoiceNumber: {
       type: String,
+      unique: true,
     },
+    name: { type: String },
     location: {
       type: String,
       required: true,
@@ -22,6 +24,16 @@ const jobSchema = new mongoose.Schema(
         message: "must be valid Email",
       },
     },
+    phone: {
+      type: String,
+      validate: {
+        validator(v) {
+          return !v || validator.isMobilePhone(v, "any");
+        },
+        message: "must be valid phone number",
+      },
+    },
+    description: { type: String },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
@@ -40,21 +52,32 @@ const jobSchema = new mongoose.Schema(
       },
       default: "Not Charged",
     },
-    invoiceInfo: {
-      type: String,
-    },
     amountOwed: {
       type: Number,
+      default: 0,
     },
     amountPaid: {
       type: Number,
+      default: 0,
     },
     dateStarted: {
-      type: Date,
-      default: Date.now,
+      type: String,
+      default: () => {
+        const now = new Date();
+
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      },
     },
     dateEnded: {
-      type: Date,
+      type: String,
+      default: null,
+    },
+    paymentTerms: {
+      type: String,
+      default: null,
+    },
+    dateDue: {
+      type: String,
       default: null,
     },
   },

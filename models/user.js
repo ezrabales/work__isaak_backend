@@ -22,6 +22,21 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 75,
   },
+  name: {
+    type: String,
+  },
+  phone: {
+    type: String,
+    validate: {
+      validator(v) {
+        return !v || validator.isMobilePhone(v, "any");
+      },
+      message: "must be valid phone number",
+    },
+  },
+  footer: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

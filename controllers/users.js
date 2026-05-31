@@ -42,17 +42,21 @@ module.exports.getCurrentUser = (req, res, next) => {
 
 module.exports.createUser = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, rate, phone, footer } = req.body;
     const newUser = await User.create({
       name,
       email,
+      rate,
+      phone,
       password: await bcrypt.hash(password, 10),
+      footer,
     });
     const userObject = newUser.toJSON();
     delete userObject.password;
 
     return res.status(201).send(userObject);
   } catch (err) {
+    console.log(err);
     if (err.name === "ValidationError") {
       return next(new BadRequestError("invalid data"));
     }

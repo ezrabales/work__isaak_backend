@@ -14,6 +14,8 @@ router.use("/users", require("./users"));
 router.use("/pictures", require("./pictures"));
 router.use("/jobs", require("./jobs"));
 router.use("/parts", require("./parts"));
+router.use("/email", require("./emails"));
+router.use("/invoice", require("./invoice"));
 
 router.get("/test", (req, res) => {
   res.send("working");

@@ -13,6 +13,10 @@ module.exports.validatorCreateUser = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
+    rate: Joi.number().optional().allow(""),
+    phone: Joi.number().optional().allow(""),
+    name: Joi.string().optional().allow(""),
+    footer: Joi.object().optional().allow(""),
   }),
 });
 
@@ -39,13 +43,22 @@ module.exports.validatorCreatePicture = celebrate({
   }),
 });
 
+module.exports.validatorDeletePicture = celebrate({
+  params: Joi.object().keys({
+    picId: Joi.string().required(),
+  }),
+});
+
 // jobs
 module.exports.validatorCreateJob = celebrate({
   body: Joi.object().keys({
     invoiceNumber: Joi.string().optional(),
     location: Joi.string().required(),
+    name: Joi.string().optional().allow(""),
     notes: Joi.string().optional().allow(""),
     email: Joi.string().email().empty("").optional(),
+    phone: Joi.string().empty("").optional(),
+    description: Joi.string().empty("").optional(),
     paymentStatus: Joi.string()
       .valid(
         "Not Charged",
@@ -66,8 +79,11 @@ module.exports.validatorUpdateJob = celebrate({
   }),
   body: Joi.object().keys({
     location: Joi.string().required(),
+    name: Joi.string().optional().allow(""),
     notes: Joi.string().optional().allow(""),
     email: Joi.string().email().allow("").optional(),
+    phone: Joi.string().empty("").optional(),
+    description: Joi.string().empty("").optional(),
     paymentStatus: Joi.string()
       .valid(
         "Not Charged",
@@ -78,8 +94,10 @@ module.exports.validatorUpdateJob = celebrate({
       .default("Not Charged"),
     amountOwed: Joi.number().optional().allow(""),
     amountPaid: Joi.number().optional().allow(""),
-    dateStarted: Joi.date().required(),
-    dateEnded: Joi.date().optional().allow(""),
+    dateStarted: Joi.string().required(),
+    dateEnded: Joi.string().optional().allow(""),
+    paymentTerms: Joi.string().optional().allow(""),
+    dateDue: Joi.string().optional().allow(""),
   }),
 });
 
@@ -107,5 +125,44 @@ module.exports.validatorCreatePart = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required(),
     cost: Joi.number().required(),
+  }),
+});
+
+// emails
+module.exports.validatorSendEmail = celebrate({
+  body: Joi.object().keys({
+    message: Joi.string().required(),
+  }),
+});
+
+// invoices
+module.exports.validatorSendInvoice = celebrate({
+  params: Joi.object().keys({
+    jobId: Joi.string(),
+  }),
+  body: Joi.object().keys({
+    invoiceNumber: Joi.string().required(),
+    customerName: Joi.string().optional().allow(""),
+    customerEmail: Joi.string().email().required(),
+    customerPhone: Joi.string().optional().allow(""),
+    date: Joi.date().required(),
+    craftsmanName: Joi.string().optional().allow(""),
+    craftsmanEmail: Joi.string().email().required(),
+    craftsmanPhone: Joi.string().optional().allow(""),
+    jobDescription: Joi.string().optional().allow(""),
+    jobLocation: Joi.string().required(),
+    paymentTerms: Joi.string().required(),
+    dateDue: Joi.string().required(),
+    parts: Joi.array().optional().allow(""),
+    service: Joi.object().optional().allow(""),
+    additions: Joi.array().optional().allow(""),
+    grandTotal: Joi.number().optional().allow(""),
+    footer: Joi.object().optional().allow(""),
+  }),
+});
+
+module.exports.validatorGetInvoice = celebrate({
+  params: Joi.object().keys({
+    invoiceNumber: Joi.string(),
   }),
 });
