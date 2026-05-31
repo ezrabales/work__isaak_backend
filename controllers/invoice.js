@@ -414,8 +414,9 @@ module.exports.sendInvoice = async (req, res, next) => {
 
     console.log("PDF built");
 
-    await resend.emails.send({
-      from: `${invoice.craftsmanName || invoice.craftsmanEmail} <noreply@yourdomain.com>`,
+    const { data, error } = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      // from: `${invoice.craftsmanName || invoice.craftsmanEmail} <noreply@yourdomain.com>`,
       to: invoice.customerEmail,
       reply_to: invoice.craftsmanEmail,
       subject: `$${Number(invoice.grandTotal).toFixed(2)} Invoice from ${invoice.craftsmanName || invoice.craftsmanEmail}`,
@@ -489,6 +490,9 @@ ${invoice.craftsmanName || invoice.craftsmanEmail}`,
         },
       ],
     });
+
+    console.log("RESEND DATA:", data);
+    console.log("RESEND ERROR:", error);
 
     console.log("Mail sent");
 
