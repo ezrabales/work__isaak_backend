@@ -414,14 +414,16 @@ module.exports.sendInvoice = async (req, res, next) => {
     console.log("PDF built");
 
     const transporter = nodemailer.createTransport({
-      host: "74.125.69.109", // smtp.gmail.com IPv4
+      host: "smtp.gmail.com",
       port: 587,
       secure: false,
-      requireTLS: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      connectionTimeout: 30000,
+      greetingTimeout: 30000,
+      socketTimeout: 30000,
     });
 
     console.log("Transport created");
