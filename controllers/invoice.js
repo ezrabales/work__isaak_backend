@@ -1,6 +1,7 @@
 const Invoice = require("../models/invoice");
 const PDFDocument = require("pdfkit");
 const nodemailer = require("nodemailer");
+const dns = require("dns");
 const Job = require("../models/job");
 
 // ─── Layout constants ────────────────────────────────────────────────────────
@@ -417,10 +418,22 @@ module.exports.sendInvoice = async (req, res, next) => {
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
-      family: 4, // force IPv4
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        family: 4,
+      },
+      getSocket: (options, callback) => {
+        dns.lookup(options.host, { family: 4 }, (err, address) => {
+          if (err) return callback(err);
+
+          callback(null, {
+            host: address,
+            port: options.port,
+          });
+        });
       },
     });
 
