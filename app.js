@@ -8,20 +8,8 @@ const { errorHandler } = require("./middlewares/errorHandler");
 const NotFoundError = require("./errors/NotFoundError");
 
 const app = express();
+
 app.use(cors());
-const PORT = process.env.PORT || 3001;
-
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-
-    app.listen(PORT, () => {
-      console.log(`Server running on ${PORT}`);
-    });
-  })
-  .catch(console.error);
-
 app.use(requestLogger);
 app.use(express.json());
 
@@ -35,6 +23,17 @@ app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 3001;
+
+console.log("MONGO_URI:", process.env.MONGO_URI);
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch(console.error);
