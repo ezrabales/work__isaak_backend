@@ -417,7 +417,7 @@ module.exports.sendInvoice = async (req, res, next) => {
     const { data, error } = await resend.emails.send({
       from: `${invoice.craftsmanName || invoice.craftsmanEmail} <invoices@plumbingtech.app>`,
       to: invoice.customerEmail,
-      reply_to: invoice.craftsmanEmail,
+      replyTo: invoice.craftsmanEmail,
       subject: `$${Number(invoice.grandTotal).toFixed(2)} Invoice from ${invoice.craftsmanName || invoice.craftsmanEmail}`,
       text: `Hello ${invoice.customerName || "there"},
 
