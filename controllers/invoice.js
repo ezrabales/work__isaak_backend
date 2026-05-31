@@ -1,6 +1,6 @@
 const Invoice = require("../models/invoice");
 const PDFDocument = require("pdfkit");
-import { Resend } from "resend";
+const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 const Job = require("../models/job");
 
