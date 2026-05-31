@@ -11,7 +11,10 @@ const app = express();
 app.use(cors());
 const PORT = process.env.PORT || 3001;
 
-mongoose.connect("mongodb://127.0.0.1:27017/isaak_backend");
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error(err));
 
 app.use(requestLogger);
 app.use(express.json());
