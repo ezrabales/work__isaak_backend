@@ -411,6 +411,9 @@ module.exports.sendInvoice = async (req, res, next) => {
       "Content-Disposition": `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`,
     });
 
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+    console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -418,6 +421,9 @@ module.exports.sendInvoice = async (req, res, next) => {
         pass: process.env.EMAIL_PASS,
       },
     });
+
+    await transporter.verify();
+    console.log("SMTP ready");
 
     await transporter.sendMail({
       from: `"${invoice.craftsmanName || invoice.craftsmanEmail}" <${process.env.EMAIL_USER}>`,
