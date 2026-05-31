@@ -9,7 +9,7 @@ const NotFoundError = require("./errors/NotFoundError");
 
 const app = express();
 app.use(cors());
-const { PORT = 3001 } = process.env;
+const PORT = process.env.PORT || 3001;
 
 mongoose.connect("mongodb://127.0.0.1:27017/isaak_backend");
 
