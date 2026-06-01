@@ -11,6 +11,7 @@ const validateURL = (value, helpers) => {
 // users
 module.exports.validatorCreateUser = celebrate({
   body: Joi.object().keys({
+    key: Joi.string().required(),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     rate: Joi.number().optional().allow(""),
