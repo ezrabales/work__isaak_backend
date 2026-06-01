@@ -42,7 +42,12 @@ module.exports.getCurrentUser = (req, res, next) => {
 
 module.exports.createUser = async (req, res, next) => {
   try {
-    const { name, email, password, rate, phone, footer } = req.body;
+    const { key, name, email, password, rate, phone, footer } = req.body;
+
+    if (key !== process.env.REGISTER_KEY) {
+      return next(new BadRequestError("invalid key"));
+    }
+
     const newUser = await User.create({
       name,
       email,
