@@ -28,6 +28,28 @@ module.exports.validatorLogIn = celebrate({
   }),
 });
 
+module.exports.validarorUpdateCurrentUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().optional().allow(""),
+    email: Joi.string().email().optional(),
+    rate: Joi.number().optional(),
+    phone: Joi.string().optional().allow(""),
+
+    footer: Joi.object({
+      companyName: Joi.string().optional().allow(""),
+      address: Joi.string().optional().allow(""),
+      payableNote: Joi.string().optional().allow(""),
+      thankYou: Joi.string().optional().allow(""),
+    }).optional(),
+  }),
+});
+
+module.exports.validarorUpdateCurrentUserPassword = celebrate({
+  body: Joi.object().keys({
+    password: Joi.string().required(),
+  }),
+});
+
 // pictures
 module.exports.validatorGetPicByInvoice = celebrate({
   params: Joi.object().keys({

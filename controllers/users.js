@@ -100,3 +100,30 @@ module.exports.getCurrentUserRate = (req, res, next) => {
     .then((user) => res.send({ rate: user.rate }))
     .catch(next);
 };
+
+module.exports.updateCurrentUser = (req, res, next) => {
+  User.findByIdAndUpdate(
+    req.user._id,
+    { $set: req.body },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .then((user) => res.send(user))
+    .catch(next);
+};
+
+module.exports.updateCurrentUserPassword = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.findByIdAndUpdate(req.user._id, { password: hashedPassword });
+
+    res.send({ message: "password successfully updated" });
+  } catch (err) {
+    next(err);
+  }
+};
