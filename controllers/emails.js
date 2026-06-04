@@ -21,9 +21,8 @@ module.exports.sendEmailToEzra = async (req, res, next) => {
       process.env.EMAILJS_SERVICE_ID,
       process.env.EMAILJS_TEMPLATE_ID,
       {
-        subject: "Contact Ezra",
         fromEmail: user.email,
-        toEmail: "bales.ezra@gmail.com",
+        from: "Plumbing Tech",
         message,
       },
     );
