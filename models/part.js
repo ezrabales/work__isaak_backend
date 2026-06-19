@@ -15,6 +15,9 @@ const partSchema = new mongoose.Schema({
     required: true,
     ref: "User",
   },
+  partNumber: {
+    type: Number,
+  },
 });
 
 module.exports = mongoose.model("Part", partSchema);
