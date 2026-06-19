@@ -3,10 +3,11 @@ const Part = require("../models/part");
 
 module.exports.createPart = async (req, res, next) => {
   try {
-    const { name, cost } = req.body;
+    const { name, cost, partNumber } = req.body;
     const newPart = await Part.create({
       name,
       cost,
+      partNumber,
       owner: req.user._id,
     });
     const partObject = newPart.toJSON();
@@ -47,6 +48,34 @@ module.exports.deletePart = (req, res, next) => {
       );
     })
     .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports.updatePart = (req, res, next) => {
+  const { partId } = req.params;
+  const userId = req.user._id;
+
+  const { name, partNumber, cost } = req.body;
+
+  Part.findOneAndUpdate(
+    { _id: partId, owner: userId },
+    {
+      name,
+      partNumber,
+      cost,
+    },
+    { new: true, runValidators: true },
+  )
+    .orFail(() => {
+      throw new NotFoundError("Part not found");
+    })
+    .then((job) => res.status(200).send(job))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("invalid data"));
+      }
+
       next(err);
     });
 };
