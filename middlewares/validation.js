@@ -201,3 +201,9 @@ module.exports.validatorGetInvoice = celebrate({
     invoiceNumber: Joi.string(),
   }),
 });
+
+module.exports.validatorResendInvoice = celebrate({
+  params: Joi.object().keys({
+    invoiceNumber: Joi.string(),
+  }),
+});
