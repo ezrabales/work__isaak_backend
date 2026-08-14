@@ -351,7 +351,6 @@ function buildInvoicePDF(invoice) {
     // FOOTER  — kept together on one page
     // ═══════════════════════════════════════════════════════════════════════
     const f = invoice.footer ?? {};
-    console.log(f);
     const contactLine = [
       f.companyName,
       f.address,
@@ -397,42 +396,26 @@ function buildInvoicePDF(invoice) {
   });
 }
 
-module.exports.sendInvoice = async (req, res, next) => {
-  const { jobId } = req.params;
-  try {
-    const invoice = await Invoice.create({
-      ...req.body,
-      owner: req.user._id,
-    });
-
-    const pdfBuffer = await buildInvoicePDF(invoice);
-
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`,
-    });
-
-    console.log("PDF built");
-
-    const { data, error } = await resend.emails.send({
-      from: `${invoice.craftsmanName || invoice.craftsmanEmail} <invoices@plumbingtech.app>`,
-      to: invoice.customerEmail,
-      replyTo: invoice.craftsmanEmail,
-      subject: `$${Number(invoice.grandTotal).toFixed(2)} Invoice from ${invoice.craftsmanName || invoice.craftsmanEmail}`,
-      text: `Hello ${invoice.customerName || "there"},
+async function sendInvoiceEmail(invoice, pdfBuffer) {
+  const { data, error } = await resend.emails.send({
+    from: `${invoice.craftsmanName || invoice.craftsmanEmail} <invoices@plumbingtech.app>`,
+    to: invoice.customerEmail,
+    replyTo: invoice.craftsmanEmail,
+    subject: `$${Number(invoice.grandTotal).toFixed(2)} Invoice from ${invoice.craftsmanName || invoice.craftsmanEmail}`,
+    text: `Hello ${invoice.customerName || "there"},
 
 Thank you for your business.
 
 Attached is your invoice (#${invoice.invoiceNumber}) from ${
-        invoice.craftsmanName || invoice.craftsmanEmail
-      } for $${invoice.grandTotal}.
+      invoice.craftsmanName || invoice.craftsmanEmail
+    } for $${invoice.grandTotal}.
 
 If you have any questions about the invoice, work completed, or payment details, simply reply to this email.
 
 Thank you — your business is appreciated.
 
 ${invoice.craftsmanName || invoice.craftsmanEmail}`,
-      html: `<!DOCTYPE html>
+    html: `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -482,18 +465,32 @@ ${invoice.craftsmanName || invoice.craftsmanEmail}`,
 
 </body>
 </html>`,
-      attachments: [
-        {
-          filename: `invoice-${invoice.invoiceNumber}.pdf`,
-          content: pdfBuffer.toString("base64"), // ← Resend wants base64, not raw Buffer
-        },
-      ],
+    attachments: [
+      {
+        filename: `invoice-${invoice.invoiceNumber}.pdf`,
+        content: pdfBuffer.toString("base64"), // ← Resend wants base64, not raw Buffer
+      },
+    ],
+  });
+  return { data, error };
+}
+
+module.exports.sendInvoice = async (req, res, next) => {
+  const { jobId } = req.params;
+  try {
+    const invoice = await Invoice.create({
+      ...req.body,
+      owner: req.user._id,
     });
 
-    console.log("RESEND DATA:", data);
-    console.log("RESEND ERROR:", error);
+    const pdfBuffer = await buildInvoicePDF(invoice);
 
-    console.log("Mail sent");
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`,
+    });
+
+    const { data, error } = await sendInvoiceEmail(invoice, pdfBuffer);
 
     try {
       const now = new Date();
@@ -536,6 +533,38 @@ module.exports.getInvoice = async (req, res, next) => {
     return res.json({
       success: true,
       pdf: pdfBuffer.toString("base64"),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.resendInvoice = async (req, res, next) => {
+  const { invoiceNumber } = req.params;
+  const owner = req.user._id;
+
+  try {
+    const invoice = await Invoice.findOne({ owner, invoiceNumber });
+    if (!invoice) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invoice not found" });
+    }
+
+    const pdfBuffer = await buildInvoicePDF(invoice);
+
+    console.log("PDF buffer:", pdfBuffer);
+    console.log("Is Buffer:", Buffer.isBuffer(pdfBuffer));
+
+    const { data, error } = await sendInvoiceEmail(invoice, pdfBuffer);
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`,
+    });
+
+    return res.json({
+      success: true,
     });
   } catch (err) {
     next(err);
