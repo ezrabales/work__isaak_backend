@@ -5,6 +5,7 @@ const {
   resendInvoice,
 } = require("../controllers/invoice");
 const { auth } = require("../middlewares/auth");
+const { disallowTester } = require("../middlewares/disallowTester");
 const {
   validatorSendInvoice,
   validatorGetInvoice,
