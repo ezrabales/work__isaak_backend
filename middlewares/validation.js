@@ -157,7 +157,7 @@ module.exports.validatorUpdatePart = celebrate({
     partId: Joi.string().hex().length(24).required(),
   }),
   body: Joi.object().keys({
-    partNumber: Joi.number().optional().allow(""),
+    partNumber: Joi.string().optional().allow(""),
     name: Joi.string().required(),
     cost: Joi.number().required(),
   }),
