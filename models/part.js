@@ -16,7 +16,7 @@ const partSchema = new mongoose.Schema({
     ref: "User",
   },
   partNumber: {
-    type: Number,
+    type: String,
   },
 });
 
