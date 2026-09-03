@@ -148,7 +148,7 @@ module.exports.validatorCreatePart = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required(),
     cost: Joi.number().required(),
-    partNumber: Joi.number().optional().allow(""),
+    partNumber: Joi.string().optional().allow(""),
   }),
 });
 
