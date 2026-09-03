@@ -2,6 +2,7 @@ const BadRequestError = require("../errors/BadRequestError");
 const NotFoundError = require("../errors/NotFoundError");
 const cloudinary = require("../utils/cloudinary");
 const Job = require("../models/job");
+const Invoice = require("../models/invoice");
 const Picture = require("../models/picture");
 
 module.exports.createJob = async (req, res, next) => {
@@ -119,6 +120,12 @@ module.exports.deleteJob = async (req, res, next) => {
     const { jobId, invoiceNumber } = req.params;
     const userId = req.user._id;
 
+    // Delete Invoice
+    const invoice = await Invoice.findOneAndDelete({
+      owner: userId,
+      invoiceNumber,
+    });
+
     const job = await Job.findById(jobId).orFail(() => {
       throw new NotFoundError("Job not found");
     });
@@ -151,4 +158,25 @@ module.exports.deleteJob = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+module.exports.deletePart = (req, res, next) => {
+  const { partId } = req.params;
+  Part.findById(partId)
+    .orFail(() => {
+      next(new NotFoundError("Part not found"));
+    })
+    .then((part) => {
+      if (req.user._id !== part.owner.toString()) {
+        return next(new ForbiddenError("Not authorized"));
+      }
+      return Part.findByIdAndDelete(partId).then(() =>
+        res
+          .status(200)
+          .send({ message: "Part deleted successfully", id: partId }),
+      );
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
