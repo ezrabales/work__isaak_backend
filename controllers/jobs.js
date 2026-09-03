@@ -121,10 +121,14 @@ module.exports.deleteJob = async (req, res, next) => {
     const userId = req.user._id;
 
     // Delete Invoice
-    const invoice = await Invoice.findOneAndDelete({
+    Invoice.findOneAndDelete({
       owner: userId,
       invoiceNumber,
-    });
+    })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => console.error(err));
 
     const job = await Job.findById(jobId).orFail(() => {
       throw new NotFoundError("Job not found");
