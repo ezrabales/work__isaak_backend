@@ -468,7 +468,7 @@ ${invoice.craftsmanName || invoice.craftsmanEmail}`,
     attachments: [
       {
         filename: `invoice-${invoice.invoiceNumber}.pdf`,
-        content: pdfBuffer.toString("base64"), // ← Resend wants base64, not raw Buffer
+        content: pdfBuffer.toString("base64"),
       },
     ],
   });

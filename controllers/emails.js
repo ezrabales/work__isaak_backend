@@ -5,6 +5,15 @@ emailjs.init({
 });
 const User = require("../models/user");
 
+const escapeHTML = (str) => {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 module.exports.sendEmailToEzra = async (req, res, next) => {
   try {
     const { message } = req.body;
@@ -17,13 +26,22 @@ module.exports.sendEmailToEzra = async (req, res, next) => {
       });
     }
 
+    const fromEmail = user.email;
+    const toEmail = "bales.ezra@gmail.com";
+
     await emailjs.send(
       process.env.EMAILJS_SERVICE_ID,
       process.env.EMAILJS_TEMPLATE_ID,
       {
-        fromEmail: user.email,
-        from: "Plumbing Tech",
-        message,
+        email_content: `
+      <h2>New Message from Plumbing Tech</h2>
+      <p><strong>From:</strong> ${fromEmail}</p>
+      <hr>
+      <p>${escapeHTML(message)}</p>
+    `,
+        subject: `New message from Plumbing Tech`,
+        toEmail: toEmail,
+        fromEmail: fromEmail,
       },
     );
 
